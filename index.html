@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="app-title">WarStreet Hub</title>
+    <style id="base-styles">
+        /* LUXURY HUB & MULTI-BRAND ENGINE */
+        @import url('https://fonts.googleapis.com/css2?family=Prata&family=Montserrat:wght@300;400;700&family=Playfair+Display:ital,wght@1,400&display=swap');
+
+        :root {
+            --c-bg: #050505;
+            --c-red: #8B1111;
+            --c-red-glow: #B00000;
+            --c-text: #F5F5F4;
+            --f-display: 'Prata', serif;
+            --f-body: 'Montserrat', sans-serif;
+            --f-italic: 'Playfair Display', serif;
+            --transition: 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--c-bg);
+            color: var(--c-text);
+            font-family: var(--f-body);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: fixed;
+        }
+
+        /* --- GLOBAL BACKGROUNDS --- */
+        .background-stage {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .video-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+            filter: grayscale(10%) contrast(1.1);
+            transition: opacity 1.5s ease;
+        }
+
+        .atmosphere-overlay {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, var(--c-overlay-1, rgba(255, 255, 255, 0.05)) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, var(--c-overlay-2, rgba(255, 255, 255, 0.02)) 0%, transparent 50%);
+            mix-blend-mode: screen;
+            z-index: 5;
+            pointer-events: none;
+            animation: drift 20s infinite alternate linear;
+        }
+
+        .guard-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, 
+                rgba(5,5,5,0.8) 0%, 
+                transparent 40%, 
+                transparent 60%, 
+                rgba(5,5,5,0.95) 100%);
+            z-index: 6;
+            pointer-events: none;
+        }
+
+        .vignette {
+            position: absolute;
+            inset: 0;
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
+            z-index: 7;
+            pointer-events: none;
+        }
+
+        /* --- STAGE WRAPPERS --- */
+        .stage {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+            z-index: 10;
+        }
+
+        .stage.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- STAGE 0: HUB --- */
+        #stage-hub {
+            padding: 40px;
+            text-align: center;
+            background: radial-gradient(circle at 50% 50%, #111 0%, #050505 100%);
+            z-index: 50;
+            overflow-y: auto; /* Allow scrolling if many brands */
+        }
+
+        .hub-title {
+            font-family: var(--f-display);
+            font-size: clamp(28px, 8vw, 42px);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeIn 1s 0.2s forwards;
+        }
+
+        .hub-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 320px;
+            opacity: 0;
+            animation: fadeIn 1s 0.5s forwards;
+            align-items: center;
+        }
+
+        .hub-category-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            opacity: 0.6;
+            margin: 32px 0 8px 0;
+            text-align: left;
+            width: 100%;
+            font-weight: 700;
+        }
+
+        .brand-link-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 24px;
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .brand-link-card:active {
+            transform: scale(0.97);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .brand-link-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--card-glow, transparent);
+            opacity: 0.4;
+            filter: blur(8px);
+        }
+
+        .brand-link-name {
+            font-family: var(--f-display);
+            font-size: 18px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .brand-link-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            opacity: 0.4;
+            margin-top: 4px;
+            font-weight: 300;
+        }
+
+        /* --- STAGE 1: CINEMATIC LANDING --- */
+        #stage-landing {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .brand-top {
+            position: absolute;
+            top: 60px;
+            opacity: 0;
+            animation: slideDown 1.5s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .brand-name {
+            font-family: var(--f-display);
+            font-size: 18px;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .brand-sub {
+            font-size: 8px;
+            letter-spacing: 0.6em;
+            text-transform: uppercase;
+            opacity: 0.5;
+        }
+
+        .hero-group {
+            opacity: 0;
+            animation: fadeInBlur 2.5s 0.5s forwards;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-title-top {
+            font-family: var(--f-display);
+            font-size: clamp(50px, 14vw, 100px);
+            line-height: 0.9;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+        }
+
+        .hero-title-accent {
+            font-family: var(--f-italic);
+            font-style: italic;
+            font-size: clamp(40px, 10vw, 80px);
+            color: var(--c-red);
+            margin-top: -15px;
+            text-shadow: 0 0 40px var(--c-glow-color, rgba(139, 17, 17, 0.4));
+            animation: glowPulse 4s infinite alternate;
+        }
+
+        /* --- STAGE 2: AD-STYLE BILLBOARD --- */
+        #stage-billboard {
+            z-index: 15;
+            background: linear-gradient(135deg, #050505 0%, #1a0505 50%, #050505 100%);
+            background-size: 400% 400%;
+            animation: backgroundFlow 10s infinite ease-in-out;
+        }
+
+        @keyframes backgroundFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .billboard-visual-area {
+            position: absolute;
+            inset: 0;
+            z-index: 25;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .product-focus-glow {
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, var(--c-scene-glow, rgba(139, 17, 17, 0.3)) 0%, transparent 70%);
+            filter: blur(60px);
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .product-focus-glow.active {
+            opacity: 0.6;
+        }
+
+        .product-hero-container {
+            position: absolute;
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 55%;
+            max-width: 450px;
+            aspect-ratio: 1/1.2;
+            z-index: 35;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1.5s ease, transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .product-hero-container.show {
+            opacity: 1;
+            animation: heroFloat 6s infinite alternate ease-in-out;
+        }
+
+        .product-hero-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 20px 25px rgba(0,0,0,0.3));
+            mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+        }
+
+        .product-hero-container::after {
+            content: '';
+            position: absolute;
+            inset: -30px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            z-index: -1;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        @keyframes heroFloat {
+            0% { transform: translate(-50%, -50%) translateY(0); }
+            100% { transform: translate(-50%, -50%) translateY(-12px); }
+        }
+
+        .billboard-text {
+            position: absolute;
+            bottom: 22%;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            text-align: center;
+            padding: 0 40px;
+        }
+
+        .scene-label {
+            font-size: 9px;
+            letter-spacing: 0.6em;
+            text-transform: uppercase;
+            opacity: 0.4;
+            margin-bottom: 12px;
+            font-weight: 300;
+        }
+
+        .scene-title {
+            font-family: var(--f-display);
+            font-size: clamp(26px, 7vw, 38px);
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            line-height: 1.1;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s 0.2s, transform 1s 0.2s;
+            color: #fff;
+        }
+
+        .scene-title.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scene-price {
+            font-family: var(--f-body);
+            font-size: 12px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 10px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 1s 0.4s, transform 1s 0.4s;
+            font-weight: 300;
+        }
+
+        .scene-price.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .billboard-image-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 2s ease-in-out, transform 12s linear;
+            z-index: 2;
+        }
+
+        .billboard-image-bg.show {
+            opacity: 0.25;
+            transform: scale(1.1);
+        }
+
+        /* --- BUTTONS --- */
+        .btn-luxury {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 22px 48px;
+            color: #fff;
+            font-family: var(--f-body);
+            font-weight: 700;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            font-size: 10px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            margin-top: 50px;
+        }
+
+        .btn-luxury.fixed-bottom {
+            position: fixed;
+            bottom: 50px;
+            width: calc(100% - 80px);
+            max-width: 340px;
+            z-index: 100;
+        }
+
+        .btn-fade {
+            opacity: 0;
+            animation: fadeIn 1.5s 1.5s forwards;
+        }
+
+        /* --- MODAL --- */
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-blur {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+        }
+
+        .modal-content {
+            position: relative;
+            z-index: 1001;
+            width: 90%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transform: translateY(30px) scale(0.95);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card:active {
+            transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 20px rgba(139, 17, 17, 0.1);
+        }
+
+        .card-img-wrapper {
+            width: 60px;
+            height: 60px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #fff;
+        }
+
+        .card-sub {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 400;
+        }
+
+        .card-price {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 4px;
+            letter-spacing: 0.1em;
+        }
+
+        .card-action {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--c-red);
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            color: #fff;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            cursor: pointer;
+            opacity: 0.4;
+            padding: 10px;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeInBlur {
+            0% { opacity: 0; filter: blur(20px); transform: scale(1.1); }
+            100% { opacity: 1; filter: blur(0); transform: scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            0% { opacity: 0; transform: translateY(-30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes glowPulse {
+            0% { color: var(--c-glow-idle, #500000); text-shadow: 0 0 10px var(--c-glow-idle-shadow, rgba(80, 0, 0, 0.2)); }
+            100% { color: var(--c-red); text-shadow: 0 0 40px var(--c-glow-active-shadow, rgba(139, 17, 17, 0.6)); }
+        }
+
+        @keyframes drift {
+            from { transform: scale(1); }
+            to { transform: scale(1.1) translate(2%, 2%); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- STAGE 0: HUB -->
+    <section id="stage-hub" class="stage">
+        <h1 class="hub-title">WarStreet Experiences</h1>
+        <div class="hub-stack" id="hub-brands-container">
+            <!-- Dynamic Brand Links grouped by category -->
+        </div>
+    </section>
+
+    <!-- Background Layer (Global except for Hub) -->
+    <div id="experience-background" class="background-stage" style="display: none;">
+        <video id="landing-video" class="video-bg" autoplay muted loop playsinline></video>
+        <div id="billboard-bg-container"></div>
+        <div class="vignette"></div>
+        <div class="guard-gradient"></div>
+        <div class="atmosphere-overlay"></div>
+    </div>
+
+    <!-- STAGE 1: CINEMATIC LANDING -->
+    <section id="stage-landing" class="stage">
+        <header class="brand-top">
+            <h2 id="brand-name-header" class="brand-name"></h2>
+            <div id="brand-sub-header" class="brand-sub"></div>
+        </header>
+
+        <div class="hero-group">
+            <h1 id="landing-title-top" class="hero-title-top"></h1>
+            <h1 id="landing-title-accent" class="hero-title-accent"></h1>
+            <p id="landing-tagline" style="font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; opacity: 0.4; margin-top: 15px; font-weight: 300;"></p>
+        </div>
+
+        <button id="cta-landing" class="btn-luxury btn-fade" onclick="goToBillboard()"></button>
+    </section>
+
+    <!-- STAGE 2: BILLBOARD -->
+    <section id="stage-billboard" class="stage">
+        <div class="billboard-visual-area">
+            <div id="product-glow" class="product-focus-glow"></div>
+            <div id="product-hero-container" class="product-hero-container">
+                <!-- Image injected via JS -->
+            </div>
+        </div>
+
+        <div class="billboard-text">
+            <div id="billboard-label" class="scene-label"></div>
+            <h2 id="scene-title-text" class="scene-title"></h2>
+            <p id="scene-price-text" class="scene-price"></p>
+        </div>
+        <button id="cta-billboard" class="btn-luxury fixed-bottom" onclick="openModal()"></button>
+    </section>
+
+    <!-- STAGE 3: MODAL -->
+    <div id="modal-booking" class="modal">
+        <div class="modal-blur" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">Close</span>
+            <div id="modal-products-list">
+                <!-- Product Items injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script id="brand-engine">
+        const CATEGORIES = {
+            beauty: { cta: "BOOK NOW" },
+            food: { cta: "ORDER NOW" },
+            fashion: { cta: "SHOP NOW" },
+            realestate: { cta: "BOOK VIEWING" },
+            automotive: { cta: "INQUIRE NOW" },
+            events: { cta: "RESERVE NOW" }
+        };
+
+        const BRANDS = {
+            "queenofhearts": {
+                "id": "queenofhearts",
+                "name": "Queen of Hearts",
+                "category": "beauty",
+                "theme": { "accent": "#8B0000", "bg": "#000000", "glow": "#ff1a1a" },
+                "visual": { "style": "soft-glow", "motion": "smooth", "speed": "slow" },
+                "copy": {
+                    "headline": "Crown Your Beauty",
+                    "subline": "Luxury Atmosphere Collection",
+                    "cta": "EXPERIENCE NOW",
+                    "video": "https://assets.mixkit.co/videos/preview/mixkit-beautiful-woman-with-long-hair-4144-large.mp4"
+                },
+                "scenes": [
+                    {
+                        "id": "accessories",
+                        "label": "ORNATE DETAILS",
+                        "title": "HAIR ACCESSORIES",
+                        "subtitle": "Regal embellishments",
+                        "price": "from $5",
+                        "image": "assets/accessories.jpg",
+                        "products": [
+                            { "name": "Hair Accessories", "subtitle": "Gold & Silver Accents", "price": "from $5", "image": "assets/accessories.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20Hair%20Accessories" }
+                        ]
+                    },
+                    {
+                        "id": "wigs",
+                        "label": "ROYAL COLLECTION",
+                        "title": "PREMIUM WIGS",
+                        "subtitle": "Unmatched softness & volume",
+                        "price": "from $50",
+                        "image": "assets/wig.jpg",
+                        "products": [
+                            { "name": "Premium Wigs", "subtitle": "Luxury Human Hair", "price": "from $50", "image": "assets/wig.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20a%20Wig" }
+                        ]
+                    },
+                    {
+                        "id": "sprays",
+                        "label": "SIGNATURE SELECTION",
+                        "title": "ESSENCE SPRAYS",
+                        "subtitle": "Refined scent for presence",
+                        "price": "from $10",
+                        "image": "assets/sprays.jpg",
+                        "products": [
+                            { "name": "Essence Sprays", "subtitle": "Signature Shine & Scent", "price": "from $10", "image": "assets/sprays.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20Essence%20Sprays" }
+                        ]
+                    }
+                ]
+            },
+            "chopchop": {
+                "id": "chopchop",
+                "name": "Chop Chop",
+                "category": "food",
+                "theme": { "accent": "#D97706", "bg": "#050505", "glow": "#fbbf24" },
+                "visual": { "style": "dynamic", "motion": "energetic", "speed": "moderate" },
+                "copy": {
+                    "headline": "Taste the Speed",
+                    "subline": "The Modern Kitchen Concept",
+                    "cta": "EXPERIENCE NOW",
+                    "video": "https://assets.mixkit.co/videos/preview/mixkit-top-view-of-a-pizza-being-sliced-31835-large.mp4"
+                },
+                "scenes": [
+                    {
+                        "id": "burgers",
+                        "label": "DAILY SPECIALS",
+                        "title": "GOURMET BURGER",
+                        "subtitle": "Organic beef. Brioche bun.",
+                        "price": "$5",
+                        "image": "assets/burger.jpg",
+                        "products": [
+                            { "name": "Gourmet Burgers", "subtitle": "Double Stack Classic", "price": "$5", "image": "assets/burger.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20a%20Burger" }
+                        ]
+                    },
+                    {
+                        "id": "combo",
+                        "label": "LIMITED OFFERS",
+                        "title": "COMBO DEAL",
+                        "subtitle": "Full meal experience",
+                        "price": "$8",
+                        "image": "assets/combo.jpg",
+                        "products": [
+                            { "name": "Combo Deal", "subtitle": "Burger + Fries + Drink", "price": "$8", "image": "assets/combo.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20the%20Combo%20Deal" }
+                        ]
+                    },
+                    {
+                        "id": "fries",
+                        "label": "SIDES",
+                        "title": "LOADED FRIES",
+                        "subtitle": "Cheesy and crispy",
+                        "price": "$3",
+                        "image": "assets/fries.jpg",
+                        "products": [
+                            { "name": "Loaded Fries", "subtitle": "Special Sauce", "price": "$3", "image": "assets/fries.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20Loaded%20Fries" }
+                        ]
+                    }
+                ]
+            },
+            "urbanthread": {
+                "id": "urbanthread",
+                "name": "Urban Thread",
+                "category": "fashion",
+                "theme": { "accent": "#5B21B6", "bg": "#0a0a0a", "glow": "#8B5CF6" },
+                "visual": { "style": "industrial", "motion": "sharp", "speed": "fast" },
+                "copy": {
+                    "headline": "Define Your Style",
+                    "subline": "Streetwear Evolution Collection",
+                    "cta": "EXPERIENCE NOW",
+                    "video": "https://assets.mixkit.co/videos/preview/mixkit-woman-walking-on-a-city-street-4161-large.mp4"
+                },
+                "scenes": [
+                    {
+                        "id": "streetwear",
+                        "label": "NEW ARRIVAL",
+                        "title": "STREETWEAR DROP",
+                        "subtitle": "Urban aesthetics",
+                        "price": "$25",
+                        "image": "assets/streetwear.jpg",
+                        "products": [
+                            { "name": "Streetwear Drop", "subtitle": "Oversized Tee", "price": "$25", "image": "assets/streetwear.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20the%20Streetwear%20Drop" }
+                        ]
+                    },
+                    {
+                        "id": "hoodie",
+                        "label": "BEST SELLER",
+                        "title": "HOODIE COLLECTION",
+                        "subtitle": "Premium comfort",
+                        "price": "$30",
+                        "image": "assets/hoodie.jpg",
+                        "products": [
+                            { "name": "Hoodie Collection", "subtitle": "Heavyweight Fleece", "price": "$30", "image": "assets/hoodie.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20a%20Hoodie" }
+                        ]
+                    },
+                    {
+                        "id": "limited",
+                        "label": "EXCLUSIVE",
+                        "title": "LIMITED EDITION",
+                        "subtitle": "One of a kind",
+                        "price": "$40",
+                        "image": "assets/limited.jpg",
+                        "products": [
+                            { "name": "Limited Edition", "subtitle": "Artist Collaboration", "price": "$40", "image": "assets/limited.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20the%20Limited%20Edition" }
+                        ]
+                    }
+                ]
+            },
+            "primenest": {
+                "id": "primenest",
+                "name": "PrimeNest Properties",
+                "category": "realestate",
+                "theme": { "accent": "#065F46", "bg": "#050505", "glow": "#10B981" },
+                "visual": { "style": "serene", "motion": "slow", "speed": "very-slow" },
+                "copy": {
+                    "headline": "Find Your Home",
+                    "subline": "Curated Luxury Real Estate",
+                    "cta": "EXPERIENCE NOW",
+                    "video": "https://assets.mixkit.co/videos/preview/mixkit-modern-house-building-exterior-42171-large.mp4"
+                },
+                "scenes": [
+                    {
+                        "id": "home",
+                        "label": "FEATURED LISTING",
+                        "title": "MODERN HOME",
+                        "subtitle": "Minimalist architecture",
+                        "price": "$120k",
+                        "image": "assets/home.jpg",
+                        "products": [
+                            { "name": "Modern Home", "subtitle": "3 Bedrooms, 2 Baths", "price": "$120k", "image": "assets/home.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20know%20more%20about%20the%20Modern%20Home" }
+                        ]
+                    },
+                    {
+                        "id": "livingroom",
+                        "label": "INTERIOR DESIGN",
+                        "title": "LIVING ROOM",
+                        "subtitle": "Elegance in detail",
+                        "price": "Premium Finish",
+                        "image": "assets/livingroom.jpg",
+                        "products": [
+                            { "name": "Living Room", "subtitle": "Bespoke Furnishing", "price": "Contact for Details", "image": "assets/livingroom.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20discuss%20the%20Living%20Room%20design" }
+                        ]
+                    },
+                    {
+                        "id": "viewing",
+                        "label": "VISIT US",
+                        "title": "BOOK VIEWING",
+                        "subtitle": "Experience it today",
+                        "price": "Available Now",
+                        "image": "assets/viewing.jpg",
+                        "products": [
+                            { "name": "Book Viewing", "subtitle": "Guided Premium Tours", "price": "Free", "image": "assets/viewing.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20book%20a%20Viewing" }
+                        ]
+                    }
+                ]
+            },
+            "velocityauto": {
+                "id": "velocityauto",
+                "name": "Velocity Auto",
+                "category": "automotive",
+                "theme": { "accent": "#1E3A8A", "bg": "#020617", "glow": "#3B82F6" },
+                "visual": { "style": "aerodynamic", "motion": "glide", "speed": "fast" },
+                "copy": {
+                    "headline": "Precision Mastery",
+                    "subline": "The Future of Driving",
+                    "cta": "EXPERIENCE NOW",
+                    "video": "https://assets.mixkit.co/videos/preview/mixkit-fast-car-driving-at-night-on-a-wet-road-4327-large.mp4"
+                },
+                "scenes": [
+                    {
+                        "id": "car",
+                        "label": "SHOWROOM",
+                        "title": "FEATURED CAR",
+                        "subtitle": "Pinnacle of engineering",
+                        "price": "$8k",
+                        "image": "assets/car.jpg",
+                        "products": [
+                            { "name": "Featured Car", "subtitle": "Sport Edition V8", "price": "$8k", "image": "assets/car.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I'm%20interested%20in%20the%20Featured%20Car" }
+                        ]
+                    },
+                    {
+                        "id": "interior",
+                        "label": "LUXURY",
+                        "title": "INTERIOR LUXURY",
+                        "subtitle": "Uncompromising comfort",
+                        "price": "Premium",
+                        "image": "assets/interior.jpg",
+                        "products": [
+                            { "name": "Interior Luxury", "subtitle": "Leather & Alcantara", "price": "Contact", "image": "assets/interior.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I'm%20interested%20in%20the%20Interior%20Luxury" }
+                        ]
+                    },
+                    {
+                        "id": "accessories2",
+                        "label": "ENHANCEMENTS",
+                        "title": "ACCESSORIES",
+                        "subtitle": "Customize your ride",
+                        "price": "From $20",
+                        "image": "assets/accessories2.jpg",
+                        "products": [
+                            { "name": "Accessories", "subtitle": "Performance Parts", "price": "From $20", "image": "assets/accessories2.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20Auto%20Accessories" }
+                        ]
+                    }
+                ]
+            },
+            "auralounge": {
+                "id": "auralounge",
+                "name": "Aura Lounge",
+                "category": "events",
+                "theme": { "accent": "#BE185D", "bg": "#000000", "glow": "#F472B6" },
+                "visual": { "style": "vibrant", "motion": "pulse", "speed": "moderate" },
+                "copy": {
+                    "headline": "Ignite the Night",
+                    "subline": "Exclusive Social Experience",
+                    "cta": "EXPERIENCE NOW",
+                    "video": "https://assets.mixkit.co/videos/preview/mixkit-close-up-of-sparkling-cocktails-4171-large.mp4"
+                },
+                "scenes": [
+                    {
+                        "id": "lounge",
+                        "label": "ATMOSPHERE",
+                        "title": "NIGHT VIBES",
+                        "subtitle": "Urban nights redefined",
+                        "price": "Tonight",
+                        "image": "assets/lounge.jpg",
+                        "products": [
+                            { "name": "Night Vibes", "subtitle": "The Ultimate Atmosphere", "price": "Entry Info", "image": "assets/lounge.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I'm%20coming%20for%20the%20Night%20Vibes" }
+                        ]
+                    },
+                    {
+                        "id": "cocktail",
+                        "label": "SIGNATURE",
+                        "title": "SIGNATURE COCKTAILS",
+                        "subtitle": "Crafted elegance",
+                        "price": "$5",
+                        "image": "assets/cocktail.jpg",
+                        "products": [
+                            { "name": "Signature Cocktails", "subtitle": "Bespoke Flavors", "price": "$5", "image": "assets/cocktail.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20the%20Signature%20Cocktails" }
+                        ]
+                    },
+                    {
+                        "id": "vip",
+                        "label": "ELITE",
+                        "title": "VIP EXPERIENCE",
+                        "subtitle": "Reserve your table",
+                        "price": "Reserve",
+                        "image": "assets/vip.jpg",
+                        "products": [
+                            { "name": "VIP Experience", "subtitle": "Priority Service", "price": "Contact", "image": "assets/vip.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20reserve%20a%20VIP%20table" }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        let currentBrandKey = params.get('brand');
+        
+        const hubStage = document.getElementById('stage-hub');
+        const landingStage = document.getElementById('stage-landing');
+        const bgArea = document.getElementById('experience-background');
+
+        function initApp() {
+            if (!currentBrandKey) {
+                showHub();
+            } else {
+                if (!BRANDS[currentBrandKey]) currentBrandKey = 'queenofhearts';
+                loadBrand(currentBrandKey);
+            }
+        }
+
+        function showHub() {
+            hubStage.classList.add('active');
+            const container = document.getElementById('hub-brands-container');
+            container.innerHTML = '';
+            
+            // Group brands by category (from config)
+            const categories = {};
+            Object.keys(BRANDS).forEach(key => {
+                const b = BRANDS[key];
+                const cat = b.category || "Other";
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push({ key, ...b });
+            });
+
+            Object.keys(categories).forEach(cat => {
+                // Category Label
+                const label = document.createElement('div');
+                label.className = "hub-category-label";
+                label.textContent = cat;
+                container.appendChild(label);
+
+                // Brands in Category
+                categories[cat].forEach(b => {
+                    const card = document.createElement('a');
+                    card.href = `?brand=${b.key}`;
+                    card.className = "brand-link-card";
+                    card.style.setProperty('--card-glow', b.theme.accent);
+                    card.innerHTML = `
+                        <div class="brand-link-name">${b.name}</div>
+                        <div class="brand-link-label">${b.category}</div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        function loadBrand(key) {
+            const config = BRANDS[key];
+            hubStage.style.display = 'none';
+            bgArea.style.display = 'block';
+            landingStage.classList.add('active');
+            
+            // Document
+            document.getElementById('app-title').textContent = `${config.name} | The Experience`;
+            
+            // Theme Styles (Inject CSS variables)
+            document.documentElement.style.setProperty('--c-red', config.theme.accent);
+            document.documentElement.style.setProperty('--c-glow-color', config.theme.glow);
+            
+            // Derive glow shades if not explicitly provided
+            const glowHex = config.theme.glow;
+            document.documentElement.style.setProperty('--c-glow-idle-shadow', `${glowHex}33`); // 20% opacity
+            document.documentElement.style.setProperty('--c-glow-active-shadow', `${glowHex}99`); // 60% opacity
+
+            // Landing Content
+            document.getElementById('brand-name-header').textContent = config.name;
+            document.getElementById('brand-sub-header').textContent = config.category;
+            
+            // Split headline for accent effect
+            const words = config.copy.headline.split(' ');
+            const accentWord = words.pop();
+            const topWords = words.join(' ');
+            
+            document.getElementById('landing-title-top').textContent = topWords;
+            document.getElementById('landing-title-accent').textContent = accentWord;
+            document.getElementById('landing-tagline').textContent = config.copy.subline;
+            document.getElementById('cta-landing').textContent = config.copy.cta;
+            document.getElementById('landing-video').innerHTML = `<source src="${config.copy.video}" type="video/mp4">`;
+            document.getElementById('landing-video').load();
+
+            // Billboard Content (Defaults)
+            document.getElementById('billboard-label').textContent = "Signature Selection";
+            
+            // Billboard CTA must come from CATEGORIES[brand.category].cta
+            const billboardCta = CATEGORIES[config.category] ? CATEGORIES[config.category].cta : config.copy.cta;
+            document.getElementById('cta-billboard').textContent = billboardCta;
+            
+            const bgContainer = document.getElementById('billboard-bg-container');
+            bgContainer.innerHTML = ''; // Clear previous
+            config.scenes.forEach((scene, i) => {
+                const img = document.createElement('img');
+                img.id = `brand-scene-bg-${i}`;
+                img.className = 'billboard-image-bg';
+                img.src = scene.image;
+                bgContainer.appendChild(img);
+            });
+
+            // Modal Products (Iterate all products in all scenes)
+            const modalList = document.getElementById('modal-products-list');
+            modalList.innerHTML = ''; // Clear previous
+            config.scenes.forEach(scene => {
+                scene.products.forEach(product => {
+                    const card = document.createElement('a');
+                    card.href = product.wa;
+                    card.target = "_blank";
+                    card.className = "product-card";
+                    card.innerHTML = `
+                        <div class="card-img-wrapper">
+                            <img src="${product.image}" class="card-img" onerror="this.src='https://via.placeholder.com/600x800?text=Product'; this.onerror=null;">
+                        </div>
+                        <div class="card-info">
+                            <div class="card-title">${product.name}</div>
+                            <div class="card-sub">${product.subtitle}</div>
+                            <div class="card-price">${product.price}</div>
+                        </div>
+                        <div class="card-action">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        </div>
+                    `;
+                    modalList.appendChild(card);
+                });
+            });
+
+            window.config = config; // Expose for billboard logic
+        }
+
+        let currentScene = 0;
+        let billboardInterval = null;
+
+        function goToBillboard() {
+            document.getElementById('stage-landing').classList.remove('active');
+            document.getElementById('stage-billboard').classList.add('active');
+            document.getElementById('landing-video').style.opacity = '0';
+            startBillboard();
+        }
+
+        function startBillboard() {
+            if (billboardInterval) return;
+            const config = window.config;
+            updateScene();
+            billboardInterval = setInterval(() => {
+                currentScene = (currentScene + 1) % config.scenes.length;
+                updateScene();
+            }, 6000);
+        }
+
+        function updateScene() {
+            const config = window.config;
+            const data = config.scenes[currentScene];
+            const titleEl = document.getElementById('scene-title-text');
+            const priceEl = document.getElementById('scene-price-text');
+            const labelEl = document.getElementById('billboard-label');
+            const glowEl = document.getElementById('product-glow');
+            const container = document.getElementById('product-hero-container');
+            
+            container.classList.remove('show');
+            titleEl.classList.remove('show');
+            priceEl.classList.remove('show');
+            glowEl.classList.remove('active');
+            
+            setTimeout(() => {
+                labelEl.textContent = data.label;
+                titleEl.textContent = data.title;
+                priceEl.textContent = data.price;
+                const newImg = new Image();
+                newImg.className = 'product-hero-img';
+                newImg.src = data.image; // Use common image for v1
+                container.innerHTML = '';
+                container.appendChild(newImg);
+                newImg.onerror = () => {
+                   newImg.src = 'https://via.placeholder.com/600x800?text=Product';
+                   newImg.onerror = null;
+                };
+                titleEl.classList.add('show');
+                priceEl.classList.add('show');
+                container.classList.add('show');
+                
+                // Use theme glow for background effect
+                glowEl.style.background = `radial-gradient(circle, ${config.theme.glow}44 0%, transparent 70%)`;
+                glowEl.classList.add('active');
+            }, 800);
+
+            config.scenes.forEach((s, i) => {
+                const bg = document.getElementById(`brand-scene-bg-${i}`);
+                if (bg) bg.classList.remove('show');
+            });
+            const activeBg = document.getElementById(`brand-scene-bg-${currentScene}`);
+            if (activeBg) activeBg.classList.add('show');
+        }
+
+        function openModal() { document.getElementById('modal-booking').classList.add('active'); }
+        function closeModal() { document.getElementById('modal-booking').classList.remove('active'); }
+
+        document.addEventListener('mousemove', (e) => {
+            const overlay = document.querySelector('.atmosphere-overlay');
+            if (overlay && document.getElementById('stage-landing').classList.contains('active')) {
+                const moveX = (e.clientX - window.innerWidth / 2) / 100;
+                const moveY = (e.clientY - window.innerHeight / 2) / 100;
+                overlay.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            }
+        });
+
+        initApp();
+    </script>
+</body>
+</html>
