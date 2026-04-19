@@ -26,12 +26,12 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
+        html, body {
             background-color: var(--c-bg);
             color: var(--c-text);
             font-family: var(--f-body);
             height: 100vh;
-            width: 100vw;
+            width: 100%;
             overflow: hidden;
             position: fixed;
         }
@@ -42,6 +42,7 @@
             inset: 0;
             z-index: 1;
             overflow: hidden;
+            pointer-events: none;
         }
 
         .video-bg {
@@ -86,6 +87,8 @@
         }
 
         /* --- STAGE WRAPPERS --- */
+        /* CORE SYSTEM LOCKED 
+           DO NOT MODIFY UNDER ANY CIRCUMSTANCE */
         .stage {
             position: absolute;
             inset: 0;
@@ -97,38 +100,75 @@
             visibility: hidden;
             transition: opacity 0.8s ease, visibility 0.8s ease;
             z-index: 10;
+            pointer-events: none;
         }
 
         .stage.active {
             opacity: 1;
             visibility: visible;
+            pointer-events: auto;
         }
 
         /* --- STAGE 0: HUB --- */
+        /* CORE SYSTEM LOCKED 
+           DO NOT MODIFY UNDER ANY CIRCUMSTANCE */
         #stage-hub {
-            padding: 40px;
+            position: absolute;
+            inset: 0;
             text-align: center;
             background: radial-gradient(circle at 50% 50%, #111 0%, #050505 100%);
             z-index: 50;
-            overflow-y: auto; /* Allow scrolling if many brands */
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 120px;
+            padding-bottom: 60px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .hub-header {
+            margin-bottom: 60px;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 1.2s forwards;
+        }
+
+        .hub-header-top {
+            font-size: 10px;
+            letter-spacing: 0.6em;
+            text-transform: uppercase;
+            opacity: 0.3;
+            margin-bottom: 8px;
         }
 
         .hub-title {
             font-family: var(--f-display);
-            font-size: clamp(28px, 8vw, 42px);
+            font-size: clamp(32px, 10vw, 54px);
             text-transform: uppercase;
-            letter-spacing: 0.2em;
-            margin-bottom: 20px;
-            opacity: 0;
-            animation: fadeIn 1s 0.2s forwards;
+            letter-spacing: 0.15em;
+            margin-bottom: 10px;
+            margin-top: 40px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .hub-header-sub {
+            font-size: 11px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0.5;
+            font-weight: 300;
         }
 
         .hub-stack {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
             width: 100%;
-            max-width: 320px;
+            max-width: 360px;
             opacity: 0;
             animation: fadeIn 1s 0.5s forwards;
             align-items: center;
@@ -138,24 +178,26 @@
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 0.4em;
-            opacity: 0.6;
-            margin: 32px 0 8px 0;
+            opacity: 0.4;
+            margin: 40px 0 12px 0;
             text-align: left;
             width: 100%;
             font-weight: 700;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 8px;
         }
 
         .brand-link-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 20px;
-            padding: 24px;
+            padding: 28px;
             text-decoration: none;
             color: #fff;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
             width: 100%;
@@ -166,32 +208,55 @@
             background: rgba(255, 255, 255, 0.06);
         }
 
-        .brand-link-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--card-glow, transparent);
-            opacity: 0.4;
-            filter: blur(8px);
+        .brand-item-top {
+            display: flex;
+            align-items: baseline;
+            gap: 15px;
+            margin-bottom: 6px;
+        }
+
+        .brand-number {
+            font-size: 11px;
+            opacity: 0.3;
+            letter-spacing: 0.3em;
+            font-family: var(--f-body);
         }
 
         .brand-link-name {
             font-family: var(--f-display);
-            font-size: 18px;
-            letter-spacing: 0.1em;
+            font-size: 20px;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
         }
 
         .brand-link-label {
-            font-size: 10px;
+            font-size: 9px;
             text-transform: uppercase;
             letter-spacing: 0.3em;
             opacity: 0.4;
-            margin-top: 4px;
+            margin-bottom: 20px;
             font-weight: 300;
+            margin-left: 38px;
+        }
+
+        .brand-link-cta {
+            font-size: 9px;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--card-glow, #fff);
+            opacity: 0.6;
+            margin-left: 38px;
+            font-weight: 700;
+        }
+
+        .hub-footer {
+            margin-top: 60px;
+            margin-bottom: 30px;
+            font-size: 10px;
+            letter-spacing: 0.3em;
+            opacity: 0.3;
+            text-align: center;
+            text-transform: uppercase;
         }
 
         /* --- STAGE 1: CINEMATIC LANDING --- */
@@ -288,11 +353,11 @@
 
         .product-hero-container {
             position: absolute;
-            top: 42%;
+            top: 38%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 55%;
-            max-width: 450px;
+            transform: translate(-50%, -50%) scale(1.05);
+            width: 85%;
+            max-width: 520px;
             aspect-ratio: 1/1.2;
             z-index: 35;
             opacity: 0;
@@ -327,8 +392,9 @@
         }
 
         @keyframes heroFloat {
-            0% { transform: translate(-50%, -50%) translateY(0); }
-            100% { transform: translate(-50%, -50%) translateY(-12px); }
+            0% { transform: translate(-50%, -50%) translateY(0) scale(1); }
+            50% { transform: translate(-50%, -50%) translateY(-10px) scale(1.03); }
+            100% { transform: translate(-50%, -50%) translateY(0) scale(1); }
         }
 
         .billboard-text {
@@ -360,6 +426,7 @@
             transform: translateY(20px);
             transition: opacity 1s 0.2s, transform 1s 0.2s;
             color: #fff;
+            text-shadow: 0 0 20px rgba(0,0,0,0.6);
         }
 
         .scene-title.show {
@@ -369,18 +436,89 @@
 
         .scene-price {
             font-family: var(--f-body);
-            font-size: 12px;
-            letter-spacing: 0.3em;
+            font-size: 22px;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.35);
-            margin-top: 10px;
+            color: #FFD700;
+            margin-top: 12px;
             opacity: 0;
             transform: translateY(10px);
             transition: opacity 1s 0.4s, transform 1s 0.4s;
-            font-weight: 300;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
         }
 
         .scene-price.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- PULSE OVERLAYS --- */
+        .city-overlay {
+            position: fixed;
+            top: env(safe-area-inset-top, 40px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            font-size: 8px;
+            letter-spacing: 0.6em;
+            text-transform: uppercase;
+            color: #fff;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+
+        .universal-mode .city-overlay {
+            opacity: 0.35;
+        }
+
+        .universal-indicator {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            font-size: 8px;
+            letter-spacing: 0.6em;
+            text-transform: uppercase;
+            color: #fff;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+
+        .universal-mode .universal-indicator {
+            opacity: 0.25;
+        }
+
+        .pulse-entry {
+            margin-top: 20px;
+            font-size: 8px;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            opacity: 0.4;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .pulse-entry:hover {
+            opacity: 0.8;
+        }
+
+        .brand-tag-overlay {
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--c-red);
+            margin-bottom: 8px;
+            font-weight: 700;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.8s ease;
+        }
+
+        .brand-tag-overlay.show {
             opacity: 1;
             transform: translateY(0);
         }
@@ -404,7 +542,7 @@
         /* --- BUTTONS --- */
         .btn-luxury {
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.25);
             padding: 22px 48px;
             color: #fff;
             font-family: var(--f-body);
@@ -419,6 +557,24 @@
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             margin-top: 50px;
+            box-shadow: 0 0 20px rgba(255,255,255,0.05);
+        }
+
+        .btn-luxury::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.25), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
         }
 
         .btn-luxury.fixed-bottom {
@@ -427,6 +583,16 @@
             width: calc(100% - 80px);
             max-width: 340px;
             z-index: 100;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s 0.6s ease;
+            pointer-events: none;
+        }
+
+        .btn-luxury.fixed-bottom.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         .btn-fade {
@@ -434,13 +600,13 @@
             animation: fadeIn 1.5s 1.5s forwards;
         }
 
-        /* --- MODAL --- */
+        /* --- MODAL SYSTEM --- */
         .modal {
             position: fixed;
             inset: 0;
             z-index: 1000;
             display: flex;
-            align-items: center;
+            align-items: flex-end; /* Mobile native drawer feel */
             justify-content: center;
             opacity: 0;
             visibility: hidden;
@@ -455,7 +621,7 @@
         .modal-blur {
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.7);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
         }
@@ -463,46 +629,73 @@
         .modal-content {
             position: relative;
             z-index: 1001;
-            width: 90%;
-            max-width: 420px;
+            width: 100%;
+            max-width: 440px;
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px 32px 0 0;
+            padding: 40px 24px 60px 24px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            transform: translateY(30px) scale(0.95);
+            gap: 16px;
+            transform: translateY(100%);
             transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 -20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            max-height: 85vh;
+            overflow-y: auto;
         }
 
         .modal.active .modal-content {
-            transform: translateY(0) scale(1);
+            transform: translateY(0);
+        }
+
+        .modal-section-title {
+            font-size: 10px;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            opacity: 0.4;
+            margin: 24px 0 12px 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-section-title::after {
+            content: '';
+            flex-grow: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.05);
         }
 
         .product-card {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 14px;
+            border-radius: 16px;
+            padding: 16px;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
             text-decoration: none;
             color: inherit;
-            transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, background 0.3s ease;
             position: relative;
-            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.04);
         }
 
         .product-card:active {
-            transform: scale(1.02);
-            background: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 0 20px rgba(139, 17, 17, 0.1);
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .card-img-wrapper {
-            width: 60px;
-            height: 60px;
+            width: 72px;
+            height: 72px;
             flex-shrink: 0;
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.04);
         }
 
         .card-img {
@@ -515,52 +708,100 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 4px;
         }
 
         .card-title {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.02em;
             color: #fff;
         }
 
         .card-sub {
-            font-size: 10px;
+            font-size: 11px;
             color: rgba(255, 255, 255, 0.5);
             font-weight: 400;
         }
 
         .card-price {
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.3);
-            margin-top: 4px;
+            font-size: 12px;
+            color: #fff;
+            margin-top: 6px;
             letter-spacing: 0.1em;
+            font-weight: 700;
+            opacity: 0.9;
         }
 
-        .card-action {
-            width: 32px;
-            height: 32px;
+        .social-links-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .social-link-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .social-link-item:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .social-icon {
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--c-red);
-            opacity: 0.6;
-            transition: opacity 0.3s ease;
+            opacity: 0.8;
         }
 
         .modal-close {
-            position: absolute;
-            top: -50px;
-            right: 0;
+            text-align: center;
             color: #fff;
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 0.4em;
             cursor: pointer;
-            opacity: 0.4;
-            padding: 10px;
+            opacity: 0.3;
+            padding: 20px;
+            margin-top: 20px;
         }
+
+        /* STAGGERED ANIMATION */
+        .stagger-item {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .modal.active .stagger-item {
+            animation: staggerSlideUp 0.6s forwards;
+        }
+
+        @keyframes staggerSlideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stagger-item:nth-child(1) { animation-delay: 0.1s; }
+        .stagger-item:nth-child(2) { animation-delay: 0.15s; }
+        .stagger-item:nth-child(3) { animation-delay: 0.2s; }
+        .stagger-item:nth-child(4) { animation-delay: 0.25s; }
+        .stagger-item:nth-child(5) { animation-delay: 0.3s; }
+        .stagger-item:nth-child(6) { animation-delay: 0.35s; }
+        .stagger-item:nth-child(7) { animation-delay: 0.4s; }
+        .stagger-item:nth-child(8) { animation-delay: 0.45s; }
 
         /* --- ANIMATIONS --- */
         @keyframes fadeInBlur {
@@ -591,12 +832,22 @@
 </head>
 <body>
 
+    <div id="universal-indicator" class="universal-indicator">UNIVERSAL MODE</div>
+
     <!-- STAGE 0: HUB -->
     <section id="stage-hub" class="stage">
-        <h1 class="hub-title">WarStreet Experiences</h1>
+        <header class="hub-header">
+            <div class="hub-header-top">WarStreet</div>
+            <h1 class="hub-title">Experiences</h1>
+            <div class="hub-header-sub">Enter a System</div>
+        </header>
         <div class="hub-stack" id="hub-brands-container">
             <!-- Dynamic Brand Links grouped by category -->
         </div>
+        <footer class="hub-footer">
+            Powered by WarStreet Experience Model
+            <div class="pulse-entry" onclick="window.location.search = '?mode=universal'">ENTER PULSE</div>
+        </footer>
     </section>
 
     <!-- Background Layer (Global except for Hub) -->
@@ -626,6 +877,7 @@
 
     <!-- STAGE 2: BILLBOARD -->
     <section id="stage-billboard" class="stage">
+        <div class="city-overlay">LONG LIVE HARARE</div>
         <div class="billboard-visual-area">
             <div id="product-glow" class="product-focus-glow"></div>
             <div id="product-hero-container" class="product-hero-container">
@@ -634,6 +886,7 @@
         </div>
 
         <div class="billboard-text">
+            <div id="brand-tag-overlay" class="brand-tag-overlay"></div>
             <div id="billboard-label" class="scene-label"></div>
             <h2 id="scene-title-text" class="scene-title"></h2>
             <p id="scene-price-text" class="scene-price"></p>
@@ -645,10 +898,10 @@
     <div id="modal-booking" class="modal">
         <div class="modal-blur" onclick="closeModal()"></div>
         <div class="modal-content">
-            <span class="modal-close" onclick="closeModal()">Close</span>
             <div id="modal-products-list">
-                <!-- Product Items injected via JS -->
+                <!-- Data injected via JS -->
             </div>
+            <div class="modal-close" onclick="closeModal()">Dismiss</div>
         </div>
     </div>
 
@@ -665,16 +918,23 @@
         const BRANDS = {
             "queenofhearts": {
                 "id": "queenofhearts",
-                "name": "Queen of Hearts",
+                "name": "Chantanya Luxe Hair",
                 "category": "beauty",
                 "theme": { "accent": "#8B0000", "bg": "#000000", "glow": "#ff1a1a" },
                 "visual": { "style": "soft-glow", "motion": "smooth", "speed": "slow" },
                 "copy": {
-                    "headline": "Crown Your Beauty",
+                    "headline": "Luxury Hair, Redefined",
                     "subline": "Luxury Atmosphere Collection",
                     "cta": "EXPERIENCE NOW",
                     "video": "https://assets.mixkit.co/videos/preview/mixkit-beautiful-woman-with-long-hair-4144-large.mp4"
                 },
+                "socials": {
+                    "instagram": "https://instagram.com/ChantanyaLuxeHair",
+                    "whatsapp": "https://wa.me/263777542031"
+                },
+                "links": [
+                    { "label": "Luxury Gallery", "url": "https://instagram.com/ChantanyaLuxeHair" }
+                ],
                 "scenes": [
                     {
                         "id": "accessories",
@@ -682,9 +942,9 @@
                         "title": "HAIR ACCESSORIES",
                         "subtitle": "Regal embellishments",
                         "price": "from $5",
-                        "image": "assets/accessories.jpg",
+                        "image": "assets/brands/chantanya-luxe-hair/scenes/accessories.jpg",
                         "products": [
-                            { "name": "Hair Accessories", "subtitle": "Gold & Silver Accents", "price": "from $5", "image": "assets/accessories.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20Hair%20Accessories" }
+                            { "name": "Hair Accessories", "subtitle": "Gold & Silver Accents", "price": "from $5", "image": "assets/brands/chantanya-luxe-hair/products/accessories.jpg", "wa": "https://wa.me/263777542031?text=Hi%2C%20I%20want%20Hair%20Accessories" }
                         ]
                     },
                     {
@@ -693,9 +953,9 @@
                         "title": "PREMIUM WIGS",
                         "subtitle": "Unmatched softness & volume",
                         "price": "from $50",
-                        "image": "assets/wig.jpg",
+                        "image": "assets/brands/chantanya-luxe-hair/scenes/wigs.jpg",
                         "products": [
-                            { "name": "Premium Wigs", "subtitle": "Luxury Human Hair", "price": "from $50", "image": "assets/wig.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20a%20Wig" }
+                            { "name": "Premium Wigs", "subtitle": "Luxury Human Hair", "price": "from $50", "image": "assets/brands/chantanya-luxe-hair/products/wig.jpg", "wa": "https://wa.me/263777542031?text=Hi%2C%20I%20want%20a%20Wig" }
                         ]
                     },
                     {
@@ -704,9 +964,9 @@
                         "title": "ESSENCE SPRAYS",
                         "subtitle": "Refined scent for presence",
                         "price": "from $10",
-                        "image": "assets/sprays.jpg",
+                        "image": "assets/brands/chantanya-luxe-hair/scenes/sprays.jpg",
                         "products": [
-                            { "name": "Essence Sprays", "subtitle": "Signature Shine & Scent", "price": "from $10", "image": "assets/sprays.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20Essence%20Sprays" }
+                            { "name": "Essence Sprays", "subtitle": "Signature Shine & Scent", "price": "from $10", "image": "assets/brands/chantanya-luxe-hair/products/sprays.jpg", "wa": "https://wa.me/263777542031?text=Hi%2C%20I%20want%20Essence%20Sprays" }
                         ]
                     }
                 ]
@@ -723,6 +983,14 @@
                     "cta": "EXPERIENCE NOW",
                     "video": "https://assets.mixkit.co/videos/preview/mixkit-top-view-of-a-pizza-being-sliced-31835-large.mp4"
                 },
+                "socials": {
+                    "instagram": "https://instagram.com/chopchop",
+                    "whatsapp": "https://wa.me/263779388560",
+                    "tiktok": "https://tiktok.com/@chopchop"
+                },
+                "links": [
+                    { "label": "Digital Menu", "url": "https://chopchop.com/menu" }
+                ],
                 "scenes": [
                     {
                         "id": "burgers",
@@ -730,9 +998,9 @@
                         "title": "GOURMET BURGER",
                         "subtitle": "Organic beef. Brioche bun.",
                         "price": "$5",
-                        "image": "assets/burger.jpg",
+                        "image": "assets/brands/chop-chop/scenes/burger.jpg",
                         "products": [
-                            { "name": "Gourmet Burgers", "subtitle": "Double Stack Classic", "price": "$5", "image": "assets/burger.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20a%20Burger" }
+                            { "name": "Gourmet Burgers", "subtitle": "Double Stack Classic", "price": "$5", "image": "assets/brands/chop-chop/products/burger.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20a%20Burger" }
                         ]
                     },
                     {
@@ -741,9 +1009,9 @@
                         "title": "COMBO DEAL",
                         "subtitle": "Full meal experience",
                         "price": "$8",
-                        "image": "assets/combo.jpg",
+                        "image": "assets/brands/chop-chop/scenes/combo.jpg",
                         "products": [
-                            { "name": "Combo Deal", "subtitle": "Burger + Fries + Drink", "price": "$8", "image": "assets/combo.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20the%20Combo%20Deal" }
+                            { "name": "Combo Deal", "subtitle": "Burger + Fries + Drink", "price": "$8", "image": "assets/brands/chop-chop/products/combo.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20the%20Combo%20Deal" }
                         ]
                     },
                     {
@@ -752,9 +1020,9 @@
                         "title": "LOADED FRIES",
                         "subtitle": "Cheesy and crispy",
                         "price": "$3",
-                        "image": "assets/fries.jpg",
+                        "image": "assets/brands/chop-chop/scenes/fries.jpg",
                         "products": [
-                            { "name": "Loaded Fries", "subtitle": "Special Sauce", "price": "$3", "image": "assets/fries.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20Loaded%20Fries" }
+                            { "name": "Loaded Fries", "subtitle": "Special Sauce", "price": "$3", "image": "assets/brands/chop-chop/products/fries.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20Loaded%20Fries" }
                         ]
                     }
                 ]
@@ -778,9 +1046,9 @@
                         "title": "STREETWEAR DROP",
                         "subtitle": "Urban aesthetics",
                         "price": "$25",
-                        "image": "assets/streetwear.jpg",
+                        "image": "assets/brands/urban-thread/scenes/streetwear.jpg",
                         "products": [
-                            { "name": "Streetwear Drop", "subtitle": "Oversized Tee", "price": "$25", "image": "assets/streetwear.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20the%20Streetwear%20Drop" }
+                            { "name": "Streetwear Drop", "subtitle": "Oversized Tee", "price": "$25", "image": "assets/brands/urban-thread/products/streetwear.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20the%20Streetwear%20Drop" }
                         ]
                     },
                     {
@@ -789,9 +1057,9 @@
                         "title": "HOODIE COLLECTION",
                         "subtitle": "Premium comfort",
                         "price": "$30",
-                        "image": "assets/hoodie.jpg",
+                        "image": "assets/brands/urban-thread/scenes/hoodie.jpg",
                         "products": [
-                            { "name": "Hoodie Collection", "subtitle": "Heavyweight Fleece", "price": "$30", "image": "assets/hoodie.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20a%20Hoodie" }
+                            { "name": "Hoodie Collection", "subtitle": "Heavyweight Fleece", "price": "$30", "image": "assets/brands/urban-thread/products/hoodie.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20a%20Hoodie" }
                         ]
                     },
                     {
@@ -800,9 +1068,9 @@
                         "title": "LIMITED EDITION",
                         "subtitle": "One of a kind",
                         "price": "$40",
-                        "image": "assets/limited.jpg",
+                        "image": "assets/brands/urban-thread/scenes/limited.jpg",
                         "products": [
-                            { "name": "Limited Edition", "subtitle": "Artist Collaboration", "price": "$40", "image": "assets/limited.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20the%20Limited%20Edition" }
+                            { "name": "Limited Edition", "subtitle": "Artist Collaboration", "price": "$40", "image": "assets/brands/urban-thread/products/limited.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20the%20Limited%20Edition" }
                         ]
                     }
                 ]
@@ -826,9 +1094,9 @@
                         "title": "MODERN HOME",
                         "subtitle": "Minimalist architecture",
                         "price": "$120k",
-                        "image": "assets/home.jpg",
+                        "image": "assets/brands/primenest/scenes/home.jpg",
                         "products": [
-                            { "name": "Modern Home", "subtitle": "3 Bedrooms, 2 Baths", "price": "$120k", "image": "assets/home.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20know%20more%20about%20the%20Modern%20Home" }
+                            { "name": "Modern Home", "subtitle": "3 Bedrooms, 2 Baths", "price": "$120k", "image": "assets/brands/primenest/products/home.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20know%20more%20about%20the%20Modern%20Home" }
                         ]
                     },
                     {
@@ -837,9 +1105,9 @@
                         "title": "LIVING ROOM",
                         "subtitle": "Elegance in detail",
                         "price": "Premium Finish",
-                        "image": "assets/livingroom.jpg",
+                        "image": "assets/brands/primenest/scenes/livingroom.jpg",
                         "products": [
-                            { "name": "Living Room", "subtitle": "Bespoke Furnishing", "price": "Contact for Details", "image": "assets/livingroom.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20discuss%20the%20Living%20Room%20design" }
+                            { "name": "Living Room", "subtitle": "Bespoke Furnishing", "price": "Contact for Details", "image": "assets/brands/primenest/products/livingroom.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20discuss%20the%20Living%20Room%20design" }
                         ]
                     },
                     {
@@ -848,9 +1116,9 @@
                         "title": "BOOK VIEWING",
                         "subtitle": "Experience it today",
                         "price": "Available Now",
-                        "image": "assets/viewing.jpg",
+                        "image": "assets/brands/primenest/scenes/viewing.jpg",
                         "products": [
-                            { "name": "Book Viewing", "subtitle": "Guided Premium Tours", "price": "Free", "image": "assets/viewing.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20book%20a%20Viewing" }
+                            { "name": "Book Viewing", "subtitle": "Guided Premium Tours", "price": "Free", "image": "assets/brands/primenest/products/viewing.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20book%20a%20Viewing" }
                         ]
                     }
                 ]
@@ -874,9 +1142,9 @@
                         "title": "FEATURED CAR",
                         "subtitle": "Pinnacle of engineering",
                         "price": "$8k",
-                        "image": "assets/car.jpg",
+                        "image": "assets/brands/velocity-auto/scenes/car.jpg",
                         "products": [
-                            { "name": "Featured Car", "subtitle": "Sport Edition V8", "price": "$8k", "image": "assets/car.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I'm%20interested%20in%20the%20Featured%20Car" }
+                            { "name": "Featured Car", "subtitle": "Sport Edition V8", "price": "$8k", "image": "assets/brands/velocity-auto/products/car.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I'm%20interested%20in%20the%20Featured%20Car" }
                         ]
                     },
                     {
@@ -885,9 +1153,9 @@
                         "title": "INTERIOR LUXURY",
                         "subtitle": "Uncompromising comfort",
                         "price": "Premium",
-                        "image": "assets/interior.jpg",
+                        "image": "assets/brands/velocity-auto/scenes/interior.jpg",
                         "products": [
-                            { "name": "Interior Luxury", "subtitle": "Leather & Alcantara", "price": "Contact", "image": "assets/interior.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I'm%20interested%20in%20the%20Interior%20Luxury" }
+                            { "name": "Interior Luxury", "subtitle": "Leather & Alcantara", "price": "Contact", "image": "assets/brands/velocity-auto/products/interior.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I'm%20interested%20in%20the%20Interior%20Luxury" }
                         ]
                     },
                     {
@@ -896,9 +1164,9 @@
                         "title": "ACCESSORIES",
                         "subtitle": "Customize your ride",
                         "price": "From $20",
-                        "image": "assets/accessories2.jpg",
+                        "image": "assets/brands/velocity-auto/scenes/accessories2.jpg",
                         "products": [
-                            { "name": "Accessories", "subtitle": "Performance Parts", "price": "From $20", "image": "assets/accessories2.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20Auto%20Accessories" }
+                            { "name": "Accessories", "subtitle": "Performance Parts", "price": "From $20", "image": "assets/brands/velocity-auto/products/accessories2.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20Auto%20Accessories" }
                         ]
                     }
                 ]
@@ -922,9 +1190,9 @@
                         "title": "NIGHT VIBES",
                         "subtitle": "Urban nights redefined",
                         "price": "Tonight",
-                        "image": "assets/lounge.jpg",
+                        "image": "assets/brands/aura-lounge/scenes/lounge.jpg",
                         "products": [
-                            { "name": "Night Vibes", "subtitle": "The Ultimate Atmosphere", "price": "Entry Info", "image": "assets/lounge.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I'm%20coming%20for%20the%20Night%20Vibes" }
+                            { "name": "Night Vibes", "subtitle": "The Ultimate Atmosphere", "price": "Entry Info", "image": "assets/brands/aura-lounge/products/lounge.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I'm%20coming%20for%20the%20Night%20Vibes" }
                         ]
                     },
                     {
@@ -933,9 +1201,9 @@
                         "title": "SIGNATURE COCKTAILS",
                         "subtitle": "Crafted elegance",
                         "price": "$5",
-                        "image": "assets/cocktail.jpg",
+                        "image": "assets/brands/aura-lounge/scenes/cocktail.jpg",
                         "products": [
-                            { "name": "Signature Cocktails", "subtitle": "Bespoke Flavors", "price": "$5", "image": "assets/cocktail.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20the%20Signature%20Cocktails" }
+                            { "name": "Signature Cocktails", "subtitle": "Bespoke Flavors", "price": "$5", "image": "assets/brands/aura-lounge/products/cocktail.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20the%20Signature%20Cocktails" }
                         ]
                     },
                     {
@@ -944,9 +1212,9 @@
                         "title": "VIP EXPERIENCE",
                         "subtitle": "Reserve your table",
                         "price": "Reserve",
-                        "image": "assets/vip.jpg",
+                        "image": "assets/brands/aura-lounge/scenes/vip.jpg",
                         "products": [
-                            { "name": "VIP Experience", "subtitle": "Priority Service", "price": "Contact", "image": "assets/vip.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20reserve%20a%20VIP%20table" }
+                            { "name": "VIP Experience", "subtitle": "Priority Service", "price": "Contact", "image": "assets/brands/aura-lounge/products/vip.jpg", "wa": "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20reserve%20a%20VIP%20table" }
                         ]
                     }
                 ]
@@ -960,8 +1228,12 @@
         const landingStage = document.getElementById('stage-landing');
         const bgArea = document.getElementById('experience-background');
 
+        const mode = params.get('mode');
+
         function initApp() {
-            if (!currentBrandKey) {
+            if (mode === 'universal') {
+                activateUniversalPulse();
+            } else if (!currentBrandKey) {
                 showHub();
             } else {
                 if (!BRANDS[currentBrandKey]) currentBrandKey = 'queenofhearts';
@@ -969,10 +1241,90 @@
             }
         }
 
+        function activateUniversalPulse() {
+            document.body.classList.add('universal-mode');
+            hubStage.classList.remove('active');
+            bgArea.style.display = 'block';
+            
+            // 1. Build Universal Feed
+            const rawFeed = Object.values(BRANDS).flatMap(brand =>
+                brand.scenes.map(scene => ({
+                    brandId: brand.id,
+                    brandName: brand.name,
+                    category: brand.category,
+                    theme: brand.theme,
+                    socials: brand.socials,
+                    links: brand.links,
+                    ...scene
+                }))
+            );
+
+            const UNIVERSAL_FEED = [];
+            rawFeed.forEach((scene, i) => {
+                UNIVERSAL_FEED.push(scene);
+                if ((i + 1) % 4 === 0) {
+                    UNIVERSAL_FEED.push({
+                        label: "WARSTREET NETWORK",
+                        title: "YOUR BRAND HERE",
+                        subtitle: "Advertise across Harare",
+                        price: "Limited Slots",
+                        image: "assets/system/placeholder.jpg",
+                        isPromo: true,
+                        wa: "https://wa.me/263779388560?text=Hi%2C%20I%20want%20to%20advertise%20on%20WarStreet",
+                        category: 'events',
+                        theme: { accent: '#ffffff', glow: '#ffffff' },
+                        id: `promo-${i}`,
+                        products: []
+                    });
+                }
+            });
+
+            // 2. Set Pulse Config
+            window.config = {
+                id: 'pulse',
+                name: 'WarStreet Pulse',
+                category: 'universal',
+                theme: { accent: '#ffffff', glow: '#ffffff' },
+                scenes: UNIVERSAL_FEED
+            };
+
+            // 3. Setup Billboard BGs
+            const bgContainer = document.getElementById('billboard-bg-container');
+            bgContainer.innerHTML = '';
+            UNIVERSAL_FEED.forEach((scene, i) => {
+                const img = document.createElement('img');
+                img.id = `brand-scene-bg-${i}`;
+                img.className = 'billboard-image-bg';
+                img.src = scene.image;
+                bgContainer.appendChild(img);
+            });
+
+            // 4. Activate Billboard
+            setTimeout(() => {
+                document.getElementById('stage-billboard').classList.add('active');
+                startBillboard();
+            }, 100);
+        }
+
         function showHub() {
             hubStage.classList.add('active');
             const container = document.getElementById('hub-brands-container');
             container.innerHTML = '';
+            
+            // 0. Universal Pulse Card (System Entry)
+            const pulseCard = document.createElement('a');
+            pulseCard.href = `?mode=universal`;
+            pulseCard.className = "brand-link-card";
+            pulseCard.style.setProperty('--card-glow', '#ffffff');
+            pulseCard.innerHTML = `
+                <div class="brand-item-top">
+                    <span class="brand-number">00</span>
+                    <div class="brand-link-name">WARSTREET PULSE</div>
+                </div>
+                <div class="brand-link-label">SYSTEM</div>
+                <div class="brand-link-cta">ENTER PULSE</div>
+            `;
+            container.appendChild(pulseCard);
             
             // Group brands by category (from config)
             const categories = {};
@@ -982,6 +1334,8 @@
                 if (!categories[cat]) categories[cat] = [];
                 categories[cat].push({ key, ...b });
             });
+
+            let globalIndex = 1;
 
             Object.keys(categories).forEach(cat => {
                 // Category Label
@@ -997,19 +1351,27 @@
                     card.className = "brand-link-card";
                     card.style.setProperty('--card-glow', b.theme.accent);
                     card.innerHTML = `
-                        <div class="brand-link-name">${b.name}</div>
+                        <div class="brand-item-top">
+                            <span class="brand-number">${String(globalIndex).padStart(2, '0')}</span>
+                            <div class="brand-link-name">${b.name}</div>
+                        </div>
                         <div class="brand-link-label">${b.category}</div>
+                        <div class="brand-link-cta">ENTER EXPERIENCE</div>
                     `;
                     container.appendChild(card);
+                    globalIndex++;
                 });
             });
         }
 
         function loadBrand(key) {
             const config = BRANDS[key];
-            hubStage.style.display = 'none';
+            hubStage.classList.remove('active');
             bgArea.style.display = 'block';
-            landingStage.classList.add('active');
+            
+            setTimeout(() => {
+                landingStage.classList.add('active');
+            }, 10);
             
             // Document
             document.getElementById('app-title').textContent = `${config.name} | The Experience`;
@@ -1022,7 +1384,7 @@
             const glowHex = config.theme.glow;
             document.documentElement.style.setProperty('--c-glow-idle-shadow', `${glowHex}33`); // 20% opacity
             document.documentElement.style.setProperty('--c-glow-active-shadow', `${glowHex}99`); // 60% opacity
-
+ 
             // Landing Content
             document.getElementById('brand-name-header').textContent = config.name;
             document.getElementById('brand-sub-header').textContent = config.category;
@@ -1038,7 +1400,7 @@
             document.getElementById('cta-landing').textContent = config.copy.cta;
             document.getElementById('landing-video').innerHTML = `<source src="${config.copy.video}" type="video/mp4">`;
             document.getElementById('landing-video').load();
-
+ 
             // Billboard Content (Defaults)
             document.getElementById('billboard-label').textContent = "Signature Selection";
             
@@ -1055,54 +1417,145 @@
                 img.src = scene.image;
                 bgContainer.appendChild(img);
             });
+ 
+            populateModal(config);
+            window.config = config; // Expose for billboard logic
+        }
 
-            // Modal Products (Iterate all products in all scenes)
+        function populateModal(config) {
+            // Modal Content Build
             const modalList = document.getElementById('modal-products-list');
-            modalList.innerHTML = ''; // Clear previous
+            modalList.innerHTML = ''; 
+ 
+            // 1. PRODUCTS SECTION
+            const prodTitle = document.createElement('div');
+            prodTitle.className = "modal-section-title stagger-item";
+            prodTitle.textContent = config.category === 'food' ? "Selected Menu" : "Signature Collection";
+            modalList.appendChild(prodTitle);
+ 
             config.scenes.forEach(scene => {
+                if (!scene.products) return;
                 scene.products.forEach(product => {
                     const card = document.createElement('a');
                     card.href = product.wa;
                     card.target = "_blank";
-                    card.className = "product-card";
+                    card.className = "product-card stagger-item";
                     card.innerHTML = `
                         <div class="card-img-wrapper">
-                            <img src="${product.image}" class="card-img" onerror="this.src='https://via.placeholder.com/600x800?text=Product'; this.onerror=null;">
+                            <img src="${product.image}" class="card-img" onerror="this.src='assets/system/fallback.jpg'; this.onerror=null;">
                         </div>
                         <div class="card-info">
                             <div class="card-title">${product.name}</div>
                             <div class="card-sub">${product.subtitle}</div>
                             <div class="card-price">${product.price}</div>
                         </div>
-                        <div class="card-action">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                        </div>
                     `;
                     modalList.appendChild(card);
                 });
             });
-
-            window.config = config; // Expose for billboard logic
+ 
+            // 2. SOCIALS & LINKS SECTION
+            if (config.socials || config.links) {
+                const connectTitle = document.createElement('div');
+                connectTitle.className = "modal-section-title stagger-item";
+                connectTitle.textContent = "Connect & Explore";
+                modalList.appendChild(connectTitle);
+ 
+                const socialGrid = document.createElement('div');
+                socialGrid.className = "social-links-grid stagger-item";
+                
+                const getPlatform = (url) => {
+                    if (url.includes('wa.me')) return { name: 'WhatsApp', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.767 5.767 0 1.267.408 2.445 1.103 3.407l-1.167 4.272 4.385-1.15c.928.528 1.997.834 3.129.834 3.181 0 5.767-2.586 5.767-5.767 0-3.181-2.586-5.767-5.767-5.767zm3.344 8.205c-.145.408-.746.738-1.032.78-.286.042-.644.075-1.032-.054-.251-.084-.569-.197-.932-.349-1.547-.643-2.553-2.206-2.63-2.308-.077-.102-.627-.834-.627-1.59s.396-1.164.536-1.314c.14-.15.306-.188.408-.188.102 0 .204.012.29.012.086 0 .204-.033.32-.303.111-.27.382-.932.415-1.01.033-.077.054-.167.012-.251-.042-.084-.092-.126-.182-.231-.09-.105-.187-.197-.272-.303-.092-.108-.192-.224-.077-.428.115-.204.512-.843 1.096-1.362.753-.67 1.341-.219 1.531-.033.19.186.311.411.36.64.049.229.049.431.025.64-.025.209-.126.333-.213.431-.087.098-.183.176-.282.264-.1.088-.204.167-.111.342.093.175.411.678.88 1.096.47.418.868.548 1.061.64.193.092.307.077.422-.054.115-.131.498-.58.63-.777.132-.197.264-.167.443-.105.179.062 1.135.536 1.328.634.193.098.32.146.368.23.048.083.048.483-.097.891z"/></svg>' };
+                    if (url.includes('instagram.com')) return { name: 'Instagram', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>' };
+                    if (url.includes('tiktok.com')) return { name: 'TikTok', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31 0 2.57.51 3.51 1.44.94.94 1.44 2.18 1.44 3.51a5.91 5.91 0 0 0-1.4 1.4c-.94.94-2.18 1.44-3.51 1.44-.1 0-.21 0-.31-.01v5.71c0 1.59-.62 3.09-1.74 4.21s-2.62 1.74-4.21 1.74c-1.59 0-3.09-.62-4.21-1.74S.355 15.09.355 13.5c0-1.59.62-3.09 1.74-4.21S4.725 7.55 6.315 7.55c.42 0 .82.04 1.21.12v2.54a3.3 3.3 0 1 0 3.3 3.3v-13.5h1.7z"/></svg>' };
+                    return { name: 'Explore', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>' };
+                };
+ 
+                const socialArr = [];
+                if (config.socials) {
+                    const order = ['whatsapp', 'instagram', 'tiktok'];
+                    order.forEach(plat => {
+                        if (config.socials[plat]) socialArr.push({ type: 'social', url: config.socials[plat] });
+                    });
+                }
+                if (config.links) {
+                    config.links.forEach(l => socialArr.push({ type: 'link', label: l.label, url: l.url }));
+                }
+ 
+                socialArr.forEach(item => {
+                    const info = getPlatform(item.url);
+                    const label = item.label || info.name;
+                    const a = document.createElement('a');
+                    a.href = item.url;
+                    a.target = "_blank";
+                    a.className = "social-link-item";
+                    a.innerHTML = `<span class="social-icon">${info.icon}</span> ${label}`;
+                    socialGrid.appendChild(a);
+                });
+                modalList.appendChild(socialGrid);
+            }
+ 
+            // 3. MAIN CTA
+            const mainCta = document.createElement('button');
+            mainCta.className = "btn-luxury stagger-item";
+            mainCta.style.width = "100%";
+            mainCta.style.marginTop = "32px";
+            mainCta.textContent = config.category === 'food' ? "VIEW MENU" : "FULL CATALOG";
+            mainCta.onclick = () => {
+                const firstLink = config.links ? config.links[0].url : (config.socials ? config.socials.instagram : '#');
+                window.open(firstLink, '_blank');
+            };
+            modalList.appendChild(mainCta);
         }
 
+        /* CORE SYSTEM LOCKED 
+           DO NOT MODIFY UNDER ANY CIRCUMSTANCE */
         let currentScene = 0;
         let billboardInterval = null;
 
         function goToBillboard() {
-            document.getElementById('stage-landing').classList.remove('active');
-            document.getElementById('stage-billboard').classList.add('active');
+            const landing = document.getElementById('stage-landing');
+            const billboard = document.getElementById('stage-billboard');
+            
+            landing.classList.remove('active');
+            
+            setTimeout(() => {
+                billboard.classList.add('active');
+            }, 100);
+            
             document.getElementById('landing-video').style.opacity = '0';
             startBillboard();
         }
 
         function startBillboard() {
-            if (billboardInterval) return;
-            const config = window.config;
-            updateScene();
-            billboardInterval = setInterval(() => {
-                currentScene = (currentScene + 1) % config.scenes.length;
+            if (billboardInterval) {
+                if (mode === 'universal') clearTimeout(billboardInterval);
+                else clearInterval(billboardInterval);
+            }
+            
+            if (mode === 'universal') {
+                pulseLoop();
+            } else {
+                const config = window.config;
                 updateScene();
-            }, 6000);
+                billboardInterval = setInterval(() => {
+                    currentScene = (currentScene + 1) % config.scenes.length;
+                    updateScene();
+                }, 6000);
+            }
+        }
+
+        function pulseLoop() {
+            const config = window.config;
+            const data = config.scenes[currentScene];
+            updateScene();
+            
+            const waitTime = data.isPromo ? 10000 : 7000;
+            
+            billboardInterval = setTimeout(() => {
+                currentScene = (currentScene + 1) % config.scenes.length;
+                pulseLoop();
+            }, waitTime);
         }
 
         function updateScene() {
@@ -1110,34 +1563,67 @@
             const data = config.scenes[currentScene];
             const titleEl = document.getElementById('scene-title-text');
             const priceEl = document.getElementById('scene-price-text');
+            const ctaEl = document.getElementById('cta-billboard');
             const labelEl = document.getElementById('billboard-label');
             const glowEl = document.getElementById('product-glow');
             const container = document.getElementById('product-hero-container');
+            const brandTag = document.getElementById('brand-tag-overlay');
             
             container.classList.remove('show');
             titleEl.classList.remove('show');
             priceEl.classList.remove('show');
+            ctaEl.classList.remove('show');
             glowEl.classList.remove('active');
+            if (brandTag) brandTag.classList.remove('show');
             
             setTimeout(() => {
                 labelEl.textContent = data.label;
                 titleEl.textContent = data.title;
                 priceEl.textContent = data.price;
+                
+                // Brand Name + Category Overlay
+                if (mode === 'universal' && !data.isPromo) {
+                    brandTag.textContent = `${data.brandName} • ${data.category}`;
+                    if (data.theme) brandTag.style.color = data.theme.accent;
+                    brandTag.classList.add('show');
+                }
+
+                // CTA Logic
+                if (data.isPromo) {
+                    ctaEl.textContent = "BOOK YOUR SLOT";
+                    ctaEl.onclick = () => window.open(data.wa, '_blank');
+                } else {
+                    ctaEl.textContent = CATEGORIES[data.category] ? CATEGORIES[data.category].cta : "EXPERIENCE NOW";
+                    ctaEl.onclick = openModal;
+                    
+                    // In universal mode, sync modal content on transition
+                    if (mode === 'universal') {
+                        populateModal({
+                            category: data.category,
+                            socials: data.socials,
+                            links: data.links,
+                            scenes: [{ products: data.products }] 
+                        });
+                    }
+                }
+
                 const newImg = new Image();
                 newImg.className = 'product-hero-img';
                 newImg.src = data.image; // Use common image for v1
                 container.innerHTML = '';
                 container.appendChild(newImg);
                 newImg.onerror = () => {
-                   newImg.src = 'https://via.placeholder.com/600x800?text=Product';
+                   newImg.src = 'assets/system/fallback.jpg';
                    newImg.onerror = null;
                 };
                 titleEl.classList.add('show');
                 priceEl.classList.add('show');
+                ctaEl.classList.add('show');
                 container.classList.add('show');
                 
                 // Use theme glow for background effect
-                glowEl.style.background = `radial-gradient(circle, ${config.theme.glow}44 0%, transparent 70%)`;
+                const glowColor = (data.theme && data.theme.glow) ? data.theme.glow : config.theme.glow;
+                glowEl.style.background = `radial-gradient(circle, ${glowColor}44 0%, transparent 70%)`;
                 glowEl.classList.add('active');
             }, 800);
 
