@@ -9,9 +9,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Prata&family=Montserrat:wght@300;400;700&family=Playfair+Display:ital,wght@1,400&display=swap');
 
         :root {
-            --c-bg: #050505;
-            --c-red: #8B1111;
-            --c-red-glow: #B00000;
             --c-text: #F5F5F4;
             --f-display: 'Prata', serif;
             --f-body: 'Montserrat', sans-serif;
@@ -27,7 +24,7 @@
         }
 
         html, body {
-            background-color: var(--c-bg);
+            background-color: #050505;
             color: var(--c-text);
             font-family: var(--f-body);
             height: 100vh;
@@ -63,7 +60,8 @@
             mix-blend-mode: screen;
             z-index: 5;
             pointer-events: none;
-            animation: drift 20s infinite alternate linear;
+            animation: drift var(--theme-drift, 20s) infinite alternate linear, 
+                       var(--bg-motion-anim, none) var(--theme-speed, 1.2s) infinite alternate;
         }
 
         .guard-gradient {
@@ -453,24 +451,17 @@
             font-family: var(--f-italic);
             font-style: italic;
             font-size: clamp(40px, 10vw, 80px);
-            color: var(--c-red);
+            color: #8B1111; /* Locked default */
             margin-top: -15px;
-            text-shadow: 0 0 40px var(--c-glow-color, rgba(139, 17, 17, 0.4));
+            text-shadow: 0 0 40px rgba(139, 17, 17, 0.4);
             animation: glowPulse 4s infinite alternate;
         }
 
         /* --- STAGE 2: AD-STYLE BILLBOARD --- */
         #stage-billboard {
             z-index: 15;
-            background: linear-gradient(135deg, #050505 0%, #1a0505 50%, #050505 100%);
-            background-size: 400% 400%;
-            animation: backgroundFlow 10s infinite ease-in-out;
-        }
-
-        @keyframes backgroundFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            background-color: var(--c-bg, #050505);
+            transition: background-color 1.5s ease;
         }
 
         .billboard-visual-area {
@@ -486,7 +477,7 @@
         .product-focus-glow {
             width: 480px;
             height: 480px;
-            background: radial-gradient(circle, var(--c-scene-glow, rgba(139, 17, 17, 0.3)) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--c-glow-color, rgba(139, 17, 17, 0.3)) 0%, transparent 70%);
             filter: blur(60px);
             opacity: 0;
             transition: opacity 1.5s ease-in-out;
@@ -510,11 +501,11 @@
             align-items: center;
             justify-content: center;
             transition: opacity 1.5s ease, transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: var(--hero-motion-anim, heroFloat) 6s infinite alternate ease-in-out;
         }
 
         .product-hero-container.show {
             opacity: 1;
-            animation: heroFloat 6s infinite alternate ease-in-out;
         }
 
         .product-hero-img {
@@ -950,7 +941,7 @@
 
         /* --- ANIMATIONS --- */
         @keyframes fadeInBlur {
-            0% { opacity: 0; filter: blur(20px); transform: scale(1.1); }
+            0% { opacity: 0; filter: blur(var(--theme-blur, 20px)); transform: scale(1.1); }
             100% { opacity: 1; filter: blur(0); transform: scale(1); }
         }
 
@@ -965,13 +956,43 @@
         }
 
         @keyframes glowPulse {
-            0% { color: var(--c-glow-idle, #500000); text-shadow: 0 0 10px var(--c-glow-idle-shadow, rgba(80, 0, 0, 0.2)); }
-            100% { color: var(--c-red); text-shadow: 0 0 40px var(--c-glow-active-shadow, rgba(139, 17, 17, 0.6)); }
+            0% { color: var(--c-glow-idle, #500000); text-shadow: 0 0 calc(10px * var(--theme-glow-intensity, 1)) var(--c-glow-idle-shadow, rgba(80, 0, 0, 0.2)); }
+            100% { color: var(--c-accent); text-shadow: 0 0 calc(40px * var(--theme-glow-intensity, 1)) var(--c-glow-active-shadow, rgba(139, 17, 17, 0.6)); }
         }
 
         @keyframes drift {
             from { transform: scale(1); }
             to { transform: scale(1.1) translate(2%, 2%); }
+        }
+
+        /* Hero Motions */
+        @keyframes floatHero {
+            0% { transform: translate(-50%, -50%) translateY(0) scale(1); }
+            100% { transform: translate(-50%, -50%) translateY(-20px) scale(1.02); }
+        }
+        
+        @keyframes dynamicHero {
+            0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) scale(1.08) rotate(3deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        }
+
+        /* BG Motions */
+        @keyframes pulseBg {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        /* Text Energy Reveal */
+        .stage.active .stagger-item,
+        .stage-active .stagger-item,
+        .active .stagger-item {
+            animation: var(--text-anim, fadeInBlur) var(--theme-speed, 1.2s) forwards;
+        }
+
+        @keyframes popUp {
+            0% { opacity: 0; transform: translateY(30px) scale(0.9) rotate(-1deg); }
+            100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
         }
     </style>
 </head>
@@ -1018,7 +1039,6 @@
     <!-- Background Layer (Global except for Hub) -->
     <div id="experience-background" class="background-stage" style="display: none;">
         <video id="landing-video" class="video-bg" autoplay muted loop playsinline></video>
-        <div id="billboard-bg-container"></div>
         <div class="vignette"></div>
         <div class="guard-gradient"></div>
         <div class="atmosphere-overlay"></div>
@@ -1046,6 +1066,12 @@
 
     <!-- STAGE 2: BILLBOARD -->
     <section id="stage-billboard" class="stage">
+        <!-- Scoped Context -->
+        <div id="billboard-bg-container"></div>
+        <div class="vignette"></div>
+        <div class="atmosphere-overlay"></div>
+        <div class="guard-gradient"></div>
+
         <div class="city-overlay">LONG LIVE HARARE</div>
         <div class="billboard-visual-area">
             <div id="product-glow" class="product-focus-glow"></div>
@@ -1055,12 +1081,12 @@
         </div>
 
         <div class="billboard-text">
-            <div id="brand-tag-overlay" class="brand-tag-overlay"></div>
-            <div id="billboard-label" class="scene-label"></div>
-            <h2 id="scene-title-text" class="scene-title"></h2>
-            <p id="scene-price-text" class="scene-price"></p>
+            <div id="brand-tag-overlay" class="brand-tag-overlay stagger-item"></div>
+            <div id="billboard-label" class="scene-label stagger-item"></div>
+            <h2 id="scene-title-text" class="scene-title stagger-item"></h2>
+            <p id="scene-price-text" class="scene-price stagger-item"></p>
         </div>
-        <button id="cta-billboard" class="btn-luxury fixed-bottom" onclick="openModal()"></button>
+        <button id="cta-billboard" class="btn-luxury fixed-bottom stagger-item" onclick="openModal()"></button>
     </section>
 
     <!-- STAGE 3: MODAL -->
@@ -1127,13 +1153,70 @@
             return "263779388560";
         }
 
+        function resolveTheme(category, agenda) {
+            const CATEGORY_PALETTE = {
+                beauty: { accent: '#8B1111', glow: '#ff1a1a', bg: '#050000' },
+                food: { accent: '#D97706', glow: '#fbbf24', bg: '#050300' },
+                fashion: { accent: '#5B21B6', glow: '#8B5CF6', bg: '#030005' },
+                realestate: { accent: '#065F46', glow: '#10B981', bg: '#000503' },
+                automotive: { accent: '#1E3A8A', glow: '#3B82F6', bg: '#000205' },
+                events: { accent: '#BE185D', glow: '#F472B6', bg: '#050005' },
+                universal: { accent: '#ffffff', glow: '#ffffff', bg: '#050505' }
+            };
+
+            const palette = CATEGORY_PALETTE[category] || CATEGORY_PALETTE.universal;
+
+            const agendas = {
+                luxury: { 
+                    speed: '2s', glow: 0.6, blur: '40px', drift: '40s', 
+                    bgMotion: 'flow', heroMotion: 'float', textEnergy: 'luxury',
+                    bg: '#020202'
+                },
+                urgent: { 
+                    speed: '0.4s', glow: 1.8, blur: '2px', drift: '8s', 
+                    bgMotion: 'pulse', heroMotion: 'dynamic', textEnergy: 'energetic',
+                    bg: '#0f0505'
+                },
+                emotional: { 
+                    speed: '1.8s', glow: 0.5, blur: '60px', drift: '50s', 
+                    bgMotion: 'flow', heroMotion: 'float', textEnergy: 'calm',
+                    bg: '#050308'
+                },
+                premium: { 
+                    speed: '1.2s', glow: 1.2, blur: '25px', drift: '25s', 
+                    bgMotion: 'flow', heroMotion: 'stable', textEnergy: 'luxury',
+                    bg: '#050505'
+                },
+                calm: { 
+                    speed: '3s', glow: 0.3, blur: '50px', drift: '60s', 
+                    bgMotion: 'static', heroMotion: 'stable', textEnergy: 'calm',
+                    bg: '#030505'
+                },
+                energetic: { 
+                    speed: '0.6s', glow: 2.2, blur: '8px', drift: '12s', 
+                    bgMotion: 'pulse', heroMotion: 'dynamic', textEnergy: 'energetic',
+                    bg: '#05050f'
+                }
+            };
+
+            const theme = { ...agendas[agenda] || agendas.premium };
+            
+            // Apply category colors
+            theme.accentColor = palette.accent;
+            theme.glowColor = palette.glow;
+            // Background color is a mix of agenda base + category tint if not strictly black
+            if (theme.bg === '#050505') theme.bg = palette.bg;
+
+            return theme;
+        }
+
         const BRANDS = {
             "queenofhearts": {
                 "id": "queenofhearts",
                 "name": "Chantanya Luxe Hair",
                 "category": "beauty",
+                "agenda": "luxury",
                 "theme": { "accent": "#8B0000", "bg": "#000000", "glow": "#ff1a1a" },
-                "visual": { "style": "soft-glow", "motion": "smooth", "speed": "slow" },
                 "copy": {
                     "headline": "Luxury Hair, Redefined",
                     "subline": "Luxury Atmosphere Collection",
@@ -1187,8 +1270,8 @@
                 "id": "chopchop",
                 "name": "Chop Chop",
                 "category": "food",
+                "agenda": "energetic",
                 "theme": { "accent": "#D97706", "bg": "#050505", "glow": "#fbbf24" },
-                "visual": { "style": "dynamic", "motion": "energetic", "speed": "moderate" },
                 "copy": {
                     "headline": "Taste the Speed",
                     "subline": "The Modern Kitchen Concept",
@@ -1243,8 +1326,8 @@
                 "id": "urbanthread",
                 "name": "Urban Thread",
                 "category": "fashion",
+                "agenda": "energetic",
                 "theme": { "accent": "#5B21B6", "bg": "#0a0a0a", "glow": "#8B5CF6" },
-                "visual": { "style": "industrial", "motion": "sharp", "speed": "fast" },
                 "copy": {
                     "headline": "Define Your Style",
                     "subline": "Streetwear Evolution Collection",
@@ -1291,8 +1374,8 @@
                 "id": "primenest",
                 "name": "PrimeNest Properties",
                 "category": "realestate",
+                "agenda": "calm",
                 "theme": { "accent": "#065F46", "bg": "#050505", "glow": "#10B981" },
-                "visual": { "style": "serene", "motion": "slow", "speed": "very-slow" },
                 "copy": {
                     "headline": "Find Your Home",
                     "subline": "Curated Luxury Real Estate",
@@ -1339,8 +1422,8 @@
                 "id": "velocityauto",
                 "name": "Velocity Auto",
                 "category": "automotive",
+                "agenda": "urgent",
                 "theme": { "accent": "#1E3A8A", "bg": "#020617", "glow": "#3B82F6" },
-                "visual": { "style": "aerodynamic", "motion": "glide", "speed": "fast" },
                 "copy": {
                     "headline": "Precision Mastery",
                     "subline": "The Future of Driving",
@@ -1387,8 +1470,8 @@
                 "id": "auralounge",
                 "name": "Aura Lounge",
                 "category": "events",
+                "agenda": "energetic",
                 "theme": { "accent": "#BE185D", "bg": "#000000", "glow": "#F472B6" },
-                "visual": { "style": "vibrant", "motion": "pulse", "speed": "moderate" },
                 "copy": {
                     "headline": "Ignite the Night",
                     "subline": "Exclusive Social Experience",
@@ -1435,8 +1518,8 @@
                 "id": "candybae",
                 "name": "Candy-Bae Treats",
                 "category": "events",
+                "agenda": "emotional",
                 "theme": { "accent": "#D2B48C", "bg": "#000000", "glow": "#F5DEB3" },
-                "visual": { "style": "soft-glow", "motion": "smooth", "speed": "slow" },
                 "copy": {
                     "headline": "Crafted for Your Moments",
                     "subline": "Signature Experiences Collection",
@@ -1574,7 +1657,10 @@
                 }
             });
 
-            // 2. Set Pulse Config
+            // 2. Set Pulse Config & Apply System Theme
+            const pulseTheme = resolveTheme('universal', 'premium');
+            applyTheme({}, pulseTheme);
+
             window.config = {
                 id: 'pulse',
                 name: 'WarStreet Pulse',
@@ -1668,12 +1754,54 @@
             });
         }
 
+        function applyTheme(config, themeProps) {
+            const billboard = document.getElementById('stage-billboard');
+            if (!billboard) return;
+
+            billboard.removeAttribute('style'); // Clear previous brand context
+
+            // Scoped Variables Only
+            billboard.style.setProperty('--c-bg', themeProps.bg);
+            billboard.style.setProperty('--c-red', themeProps.accentColor);
+            billboard.style.setProperty('--c-glow-color', themeProps.glowColor);
+            billboard.style.setProperty('--theme-glow-intensity', themeProps.glow);
+            billboard.style.setProperty('--theme-speed', themeProps.speed);
+            billboard.style.setProperty('--theme-blur', themeProps.blur);
+            billboard.style.setProperty('--theme-drift', themeProps.drift);
+            
+            // Motion Mapping
+            const motions = {
+                flow: 'drift',
+                pulse: 'bgPulse',
+                static: 'none'
+            };
+            billboard.style.setProperty('--bg-motion-anim', motions[themeProps.bgMotion]);
+            
+            const heroMotions = {
+                float: 'floatHero',
+                dynamic: 'dynamicHero',
+                stable: 'none'
+            };
+            billboard.style.setProperty('--hero-motion-anim', heroMotions[themeProps.heroMotion]);
+
+            const textAnims = {
+                luxury: 'fadeInBlur',
+                energetic: 'popUp',
+                calm: 'fadeIn'
+            };
+            billboard.style.setProperty('--text-anim', textAnims[themeProps.textEnergy]);
+        }
+
         function loadBrand(key) {
             saveRecent(key);
             stopAudio();
             const config = BRANDS[key];
             hubStage.classList.remove('active');
             bgArea.style.display = 'block';
+
+            // 1. Resolve & Apply Dynamic Theme
+            const themeProps = resolveTheme(config.category, config.agenda);
+            applyTheme(config, themeProps);
             
             setTimeout(() => {
                 landingStage.classList.add('active');
@@ -1682,15 +1810,6 @@
             // Document
             document.getElementById('app-title').textContent = `${config.name} | The Experience`;
             
-            // Theme Styles (Inject CSS variables)
-            document.documentElement.style.setProperty('--c-red', config.theme.accent);
-            document.documentElement.style.setProperty('--c-glow-color', config.theme.glow);
-            
-            // Derive glow shades if not explicitly provided
-            const glowHex = config.theme.glow;
-            document.documentElement.style.setProperty('--c-glow-idle-shadow', `${glowHex}33`); // 20% opacity
-            document.documentElement.style.setProperty('--c-glow-active-shadow', `${glowHex}99`); // 60% opacity
- 
             // Landing Content
             document.getElementById('brand-name-header').textContent = config.name;
             document.getElementById('brand-sub-header').textContent = config.category;
@@ -2077,9 +2196,13 @@
                 ctaEl.classList.add('show');
                 container.classList.add('show');
                 
-                // Use theme glow for background effect
-                const glowColor = (data.theme && data.theme.glow) ? data.theme.glow : config.theme.glow;
-                glowEl.style.background = `radial-gradient(circle, ${glowColor}44 0%, transparent 70%)`;
+                // Use theme variables for background effect
+                const currentTheme = (data.theme) ? data.theme : config.theme;
+                const billboard = document.getElementById('stage-billboard');
+                billboard.style.setProperty('--c-glow-color', currentTheme.glow);
+                if (currentTheme.accent) billboard.style.setProperty('--c-red', currentTheme.accent);
+                if (currentTheme.bg) billboard.style.setProperty('--c-bg', currentTheme.bg);
+
                 glowEl.classList.add('active');
             }, 800);
 
@@ -2095,11 +2218,20 @@
         function closeModal() { document.getElementById('modal-booking').classList.remove('active'); }
 
         document.addEventListener('mousemove', (e) => {
-            const overlay = document.querySelector('.atmosphere-overlay');
-            if (overlay && document.getElementById('stage-landing').classList.contains('active')) {
-                const moveX = (e.clientX - window.innerWidth / 2) / 100;
-                const moveY = (e.clientY - window.innerHeight / 2) / 100;
-                overlay.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            if (document.getElementById('stage-landing').classList.contains('active')) {
+                const overlay = document.querySelector('#experience-background .atmosphere-overlay');
+                if (overlay) {
+                    const moveX = (e.clientX - window.innerWidth / 2) / 100;
+                    const moveY = (e.clientY - window.innerHeight / 2) / 100;
+                    overlay.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                }
+            } else if (document.getElementById('stage-billboard').classList.contains('active')) {
+                const overlay = document.querySelector('#stage-billboard .atmosphere-overlay');
+                if (overlay) {
+                    const moveX = (e.clientX - window.innerWidth / 2) / 80;
+                    const moveY = (e.clientY - window.innerHeight / 2) / 80;
+                    overlay.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                }
             }
         });
 
